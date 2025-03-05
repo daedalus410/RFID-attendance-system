@@ -1,0 +1,19 @@
+# Secrets
+.env
+*.key
+
+# Database credentials
+/config/
+
+# Python
+__pycache__/
+venv/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# Local SQL dumps
+*.sql
+*.dump

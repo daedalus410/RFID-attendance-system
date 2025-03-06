@@ -53,3 +53,7 @@ An RFID-based attendance system using ESP32, MySQL, and Flask.
 
 ## 🔒 Security Note
 **Never commit secrets** (API keys, passwords). Use `.env` files!
+
+![Python](https://img.shields.io/badge/python-3.8%2B-blue)
+![Flask](https://img.shields.io/badge/flask-2.0.1-green)
+![MySQL](https://img.shields.io/badge/mysql-8.0-orange)

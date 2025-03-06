@@ -1,54 +1,100 @@
 """
-RFID Attendance System - Backend Server (Flask + MySQL)
+RFID Attendance System - Backend (Flask)
 Authors: [Your Names]
 Date: [Date]
 
-This server handles:
-- RFID attendance logging via POST requests
-- Database connectivity checks
-- API key authentication for secure access
+Supports:
+- MySQL (local development)
+- PostgreSQL (Heroku production)
+- JWT authentication
+- Environment variables for security
 """
 
 # =============================================================================
-# Import Required Libraries
+# Imports and Configuration
 # =============================================================================
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
-import pymysql.cursors
+import os
+import jwt
+import datetime
+from functools import wraps
+from dotenv import load_dotenv
 
-# =============================================================================
-# Initialize Flask Application
-# =============================================================================
+# Database connectors (both installed via requirements.txt)
+try:
+    import pymysql.cursors  # MySQL
+except ImportError:
+    pass  # Not needed on Heroku
+
+try:
+    import psycopg2  # PostgreSQL
+except ImportError:
+    pass  # Not needed locally
+
+load_dotenv()
+
 app = Flask(__name__)
-CORS(app)  # Enable Cross-Origin Resource Sharing
+CORS(app)
 
 # =============================================================================
-# Configuration Settings (Move to environment variables in production!)
+# Database Configuration
 # =============================================================================
-API_KEY = "4102001"  # Secret key for API authentication
 
-# MySQL Database Configuration
-db_config = {
-    'host': 'localhost',
-    'user': 'daedalus',
-    'password': '4102001',
-    'database': 'attendance_db',
-    'cursorclass': pymysql.cursors.DictCursor
-}
-
-# =============================================================================
-# Authentication Middleware
-# =============================================================================
-def require_api_key(func):
+def get_db_connection():
     """
-    Decorator function to validate API key in request headers
+    Returns a database connection based on the environment.
+    - Uses PostgreSQL on Heroku (DATABASE_URL auto-set by Heroku)
+    - Uses MySQL locally (credentials from .env)
     """
-    def wrapper(*args, **kwargs):
-        provided_key = request.headers.get('X-API-Key')
-        if provided_key != API_KEY:
-            abort(401, "Invalid API key")
-        return func(*args, **kwargs)
-    return wrapper
+    if 'DYNO' in os.environ:  # Detect Heroku environment
+        # PostgreSQL connection for Heroku
+        conn = psycopg2.connect(
+            os.getenv("DATABASE_URL"),
+            sslmode='require'
+        )
+    else:
+        # MySQL connection for local development
+        conn = pymysql.connect(
+            host=os.getenv("DB_HOST", "localhost"),
+            user=os.getenv("DB_USER", "daedalus"),
+            password=os.getenv("DB_PASSWORD", "4102001"),
+            database=os.getenv("DB_NAME", "attendance_db"),
+            cursorclass=pymysql.cursors.DictCursor
+        )
+    return conn
+
+# =============================================================================
+# JWT Authentication
+# =============================================================================
+
+JWT_SECRET = os.getenv("JWT_SECRET", "fallback-secret-for-dev")
+
+def generate_token(user_id):
+    """Generate JWT token for authenticated users"""
+    payload = {
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),
+        "iat": datetime.datetime.utcnow(),
+        "sub": user_id
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+
+def token_required(f):
+    """Decorator to validate JWT tokens"""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get("Authorization")
+        if not token:
+            abort(401, "Token missing")
+        try:
+            data = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+            current_user = data["sub"]
+        except jwt.ExpiredSignatureError:
+            abort(401, "Token expired")
+        except Exception as e:
+            abort(401, "Invalid token")
+        return f(current_user, *args, **kwargs)
+    return decorated
 
 # =============================================================================
 # API Endpoints
@@ -56,44 +102,43 @@ def require_api_key(func):
 
 @app.route('/api/db-test', methods=['GET'])
 def db_test():
-    """
-    Test database connectivity
-    Returns: JSON response with connection status
-    """
+    """Test database connectivity for both MySQL/PostgreSQL"""
     try:
-        connection = pymysql.connect(**db_config)
-        with connection.cursor() as cursor:
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
             cursor.execute("SELECT 1")
             result = cursor.fetchone()
-        return jsonify({
-            "message": "Database connected! ✅", 
-            "data": result
-        })
+        return jsonify({"message": "Database connected!", "data": result})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/login', methods=['POST'])
+def login():
+    """Authenticate users (mock credentials - replace with real user table)"""
+    data = request.get_json()
+    username = data.get("username")
+    password = data.get("password")
+
+    # Replace with actual user table query
+    if username == "admin" and password == "admin123":
+        token = generate_token(1)  # user_id=1 for admin
+        return jsonify({"token": token})
+    else:
+        return jsonify({"error": "Invalid credentials"}), 401
 
 @app.route('/api/attendance', methods=['POST'])
-@require_api_key  # Requires valid API key in headers
 def record_attendance():
-    """
-    Record attendance from RFID scan
-    Expected JSON payload: {"rfid_tag": "ABC123"}
-    Returns: JSON confirmation or error message
-    """
-    # Get and validate request data
+    """Record attendance from RFID scan (works with both DBs)"""
     data = request.get_json()
-    rfid_tag = data.get('rfid_tag')
-    
+    rfid_tag = data.get("rfid_tag")
+
     if not rfid_tag:
-        return jsonify({"error": "RFID tag is required"}), 400
+        return jsonify({"error": "RFID required"}), 400
 
     try:
-        # Connect to database
-        connection = pymysql.connect(**db_config)
-        
-        with connection.cursor() as cursor:
-            # Step 1: Verify RFID exists in users table
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            # Works for both MySQL and PostgreSQL
             cursor.execute(
                 "SELECT user_id FROM users WHERE rfid_tag = %s",
                 (rfid_tag,)
@@ -101,35 +146,28 @@ def record_attendance():
             user = cursor.fetchone()
             
             if not user:
-                return jsonify({"error": "User not registered"}), 404
+                return jsonify({"error": "User not found"}), 404
 
-            # Step 2: Record attendance entry
+            # PostgreSQL uses SERIAL, MySQL uses AUTO_INCREMENT
             cursor.execute(
                 "INSERT INTO attendance (user_id) VALUES (%s)",
                 (user['user_id'],)
             )
-            connection.commit()
+            conn.commit()
             
-        return jsonify({"message": "Attendance recorded! ✅"})
-
+        return jsonify({"message": "Attendance recorded!"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 # =============================================================================
 # Server Initialization
 # =============================================================================
-if __name__ == '__main__':
-    app.run(
-        debug=True,    # Debug mode (disable in production)
-        port=5000      # Local development port
-    )
 
-"""
-Security Improvements Needed for Production:
-1. Replace hardcoded credentials with environment variables
-2. Use HTTPS with SSL/TLS encryption
-3. Implement rate limiting
-4. Add input validation/sanitization
-5. Disable debug mode
-"""
+if __name__ == '__main__':
+    # Heroku sets PORT environment variable
+    port = int(os.environ.get("PORT", 5000))
+    app.run(
+        host='0.0.0.0',
+        port=port,
+        debug=(os.getenv("FLASK_ENV") == "development")
+    )

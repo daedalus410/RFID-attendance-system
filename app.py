@@ -1,3 +1,5 @@
+# signed by: Aohamed-Amid
+
 """
 RFID Attendance System - Backend (Flask)
 Version: 2.1

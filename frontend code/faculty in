@@ -1,0 +1,106 @@
+/* Border radius */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-family: "Playfair Display";
+  font-weight: normal;
+  margin-bottom: 1rem;
+  align-self: center;
+  background-color: antiquewhite;
+  padding: 5px;
+  border-radius: 15px;
+}
+
+.svg {
+  width: 5rem;
+  height: 5rem;
+}
+
+.svg2 {
+  width: 5rem;
+  height: 5rem;
+}
+
+body {
+  font-family: Mukta, sans-serif, playfair display;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9rem;
+  background: url(faculty.jpg) center/cover no-repeat;
+}
+
+main.table {
+    width: 82vw;
+    height: 90vh;
+    background-color: #fff5;
+    backdrop-filter: blur(10px);
+
+
+}
+
+
+td img {
+    width: 36px;
+    height: 36px;
+    margin-right: 0.5rem;
+    border-radius: 50%;
+    vertical-align: middle;
+    object-fit: cover;
+    box-shadow: #4f546c 2px 2px 4px;
+}
+
+table {
+  border-collapse: collapse;
+  box-shadow: 0 5px 10px #e1e5ee;
+  background-color: #fff5;
+  text-align: left;
+  overflow: hidden;
+}
+table thead {
+  box-shadow: 0 5px 10px #e1e5ee;
+}
+table th {
+  padding: 1rem 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+table, td {
+  padding: 1rem 2rem;
+}
+table .status {
+  border-radius: 0.2rem;
+  background-color: red;
+  padding: 0.2rem 1rem;
+  text-align: center;
+}
+table .status-pending {
+  background-color: #FFEFBD;
+  color: #a68b00;
+}
+table .status-present {
+  background-color: #c8e6c9;
+  color: #388e3c;
+}
+table .status-abscent {
+  background-color: #ffCDD2;
+  color: #c62828;
+}
+table tr:nth-child(even) {
+  background-color: #f4f6fb;
+}

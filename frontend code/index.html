@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<>, initial-scale=1.0">
+    <title>Document</title>
+    <script src="main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
+    
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css" />
+  
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+<link rel="stylesheet" href="/DataTables/datatables.css" />
+ 
+<script src="/DataTables/datatables.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?
+family=Lato:wght@300;400;700;900&
+family=Mukta:wght@300;400;600;700;800&
+family=Noto+Sans:wght@400;700&display=swap" 
+rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styl.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pangolin&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Concert+One&family=Pangolin&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+<!--  -->
+</head>
+
+<body>
+    <div class="wrapper">
+        
+     <header>
+        <a href="#"><img class="svg" src="/377610.svg" alt="Faculty of electronic engineering"></a>
+        <h3>Students attendance tracker</h3>
+        <a href="#"><img class="svg2" src="/file.svg" alt="communicatio system"></a>
+    </header>
+
+   <main class="table">
+        <div class="attendance table">
+        <table id="data_table">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Attendance</th>
+                    <th>check-in time</th>
+                    <th>check-out time</th>
+                    <th> check-in class</th>
+                    <th>check-out class</th>
+                 </tr>
+             </thead>
+
+             <tbody>
+                <tr>
+                    <td>1900365</td>
+                    <td class="name"><img src="Amid.png" alt="amid">Mohamed Amid Youness</td>
+                    <td>
+                    <p class="status status-present">Present</p>
+                    </td>
+                    <td class="check-in"><strong>08:00:00</strong></td>
+                    <td class="check-out"><strong>12:00:00</strong></td>
+                    <td class="check-in-class">maths</td>
+                    <td class="check-out-class">physics</td>
+                </tr>
+
+                <tr>
+                    <td>1900365</td>
+                    <td class="name"><img src="Azab.png" alt="azab">Mohamed Ahmed Elazab</td>
+                    <td>
+                    <p class="status status-abscent">absent</p>
+                    </td>
+                    <td class="check-in"><strong>08:00:00</strong></td>
+                    <td class="check-out"><strong>12:00:00</strong></td>
+                    <td class="check-in-class">maths</td>
+                    <td class="check-out-class">physics</td>
+
+                </tr>
+
+                <tr>
+                    <td>1900365</td>
+                    <td class="name"><img src="Tarek.png" alt="">Tarek Adel Elkellawy</td>
+                    <td>
+                    <p class="status status-pending">pending</p>
+                    </td>
+                    <td class="check-in"><strong>08:00:00</strong></td>
+                    <td class="check-out"><strong>12:00:00</strong></td>
+                    <td class="check-in-class">maths</td>
+                    <td class="check-out-class">physics</td>
+                </tr>
+               
+                
+             </tbody>
+        </table>
+        </div>
+    </main>
+
+</div>
+</body>
+</html>
